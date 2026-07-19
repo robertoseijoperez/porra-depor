@@ -1,0 +1,5 @@
+src/
+.angular/
+dist/
+angular.json
+tsconfig.json

@@ -7,10 +7,23 @@
 /bazel-out
 
 # Node
-functions/service-account-key.json
 /node_modules
 npm-debug.log
 yarn-error.log
+
+# Angular
+node_modules/
+dist/
+.angular/
+
+# Server
+server/node_modules/
+server/service-account-key.json
+
+# Otros
+.env
+*.log
+
 
 # IDEs and editors
 .idea/
