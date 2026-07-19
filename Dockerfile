@@ -10,7 +10,8 @@ RUN cd server && npm install
 COPY server/ ./server/
 
 # Crear service-account-key.json desde variable de entorno
-RUN echo "$SERVICE_ACCOUNT_KEY" > ./server/service-account-key.json
+RUN echo "$SERVICE_ACCOUNT_KEY" | base64 -d > ./server/service-account-key.json
+
 
 EXPOSE 3000
 
