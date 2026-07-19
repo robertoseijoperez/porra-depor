@@ -1,6 +1,5 @@
-[phases.setup]
-nixpkgsArchive = '1c3fe55ad329cbcb28471bb30f05c9827f724c76'
+buildImage = 'ghcr.io/railwayapp/nixpacks:latest'
 
-[variables]
-NODE_VERSION = '22.15.1'
-NIXPACKS_NODE_VERSION = '22'
+[phases.setup]
+nixPkgs = ["nodejs_24"]
+nixpkgsArchive = 'cf93ceb06388f5714302b702cccf2c77f6064442'
