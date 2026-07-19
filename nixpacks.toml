@@ -1,5 +1,0 @@
-buildImage = 'ghcr.io/railwayapp/nixpacks:latest'
-
-[phases.setup]
-nixPkgs = ["nodejs_24"]
-nixpkgsArchive = 'a2559090680c2f2160d70b741005a3962d3c12fa'
