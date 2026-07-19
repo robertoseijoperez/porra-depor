@@ -1,25 +1,20 @@
-# 1. Fase de compilación
-FROM node:24.16.0-alpine AS build
+# Etapa 1: Instalar dependencias del servidor
+FROM node:20-alpine
+
 WORKDIR /app
 
-# Copiar archivos de configuración del frontend
-COPY package*.json ./
-RUN npm ci
+# Copiar server
+COPY server/package*.json ./server/
+RUN cd server && npm ci
 
-# Copiar el código fuente y compilar
-COPY . .
-RUN npm run build
+# Copiar archivos del servidor
+COPY server/ ./server/
 
-# 2. Fase de ejecución (Servidor de estáticos)
-FROM node:24.16.0-alpine
-WORKDIR /app
+# Copiar service account (asegúrate de que existe)
+COPY server/service-account-key.json ./server/
 
-# Instalar un servidor estático ligero
-RUN npm install -g serve
-
-# Copiar los archivos compilados desde la fase anterior
-# (Asegúrate de que "porra-depor" coincide con el nombre en tu dist/)
-COPY --from=build /app/dist/porra-depor/browser ./browser
-
+# Exponer puerto
 EXPOSE 3000
-CMD ["serve", "-s", "browser", "-l", "3000"]
+
+# Ejecutar servidor
+CMD ["node", "server/index.js"]
