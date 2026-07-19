@@ -135,9 +135,9 @@ export class SheetsService {
   }
 
   guardarPronostico(numeroJornada: number, jugador: string, pronostico: string) {
-  const scriptUrl = 'https://script.google.com/macros/s/AKfycbw9s7SUQyjAGokLSYanCJQYQU-Ia2NIT6OVVHiV8LsArxazB7vWQY0aoB7GqyP2rKeW/userweb';                                                        
+  const railwayUrl = 'https://porra-depor-prod-xxxx.railway.app/guardarPronostico';
   
-  return this.http.post<any>(scriptUrl, {
+  return this.http.post<any>(railwayUrl, {
     numeroJornada,
     jugador,
     pronostico
