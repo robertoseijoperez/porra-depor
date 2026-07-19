@@ -1,0 +1,102 @@
+<main class="page">
+  <header class="hero hero--compact">
+    <a routerLink="/" class="back-link">← Clasificación</a>
+    @if (cargando()) {
+      <p class="estado">Cargando perfil...</p>
+    }
+    @else if (error()) {
+    <p class="estado error">Error al cargar el perfil del jugador. Inténtalo de nuevo.</p>
+  } @else if (stats()) {
+    <div class="player-header">
+      <img [src]="fotoPerfil()" alt="Foto de {{ stats()!.nombre }}" class="player-photo">
+
+      <div>
+        <h1>{{ stats()!.nombre }}</h1>    
+        <h5>Posición: {{ posicionJugador() }}</h5>
+      </div>
+    </div>
+  }
+ </header>
+
+  @if (cargando()) {
+    <p class="estado">Cargando perfil...</p>
+  } @else if (error()) {
+    <p class="estado error">Error al cargar el perfil del jugador. Inténtalo de nuevo.</p>
+  } @else if (stats()) {
+    <div class="perfil">      
+      <div class="stats-grid">
+        <div class="stat-card">
+          <span class="stat-label">Puntos Totales</span>
+          <span class="stat-value">{{ stats()!.puntosTotales }}</span>
+        </div>
+        <div class="stat-card">
+          <span class="stat-label">Promedio/Jornada</span>
+          <span class="stat-value">{{ stats()!.puntosPromedio }}</span>
+        </div>
+        <div class="stat-card">
+          <span class="stat-label">Aciertos</span>
+          <span class="stat-value">{{ getAciertos() }}/{{ stats()!.jornadas.length }}</span>
+        </div>
+        <div class="stat-card">
+          <span class="stat-label">Tasa Acierto</span>
+          <span class="stat-value">{{ getTasaAcierto() }}%</span>
+        </div>
+      </div>
+
+      <div class="highlights">
+        @if (getMejorJornada()) {
+          <div class="highlight mejor">
+            <span class="highlight__label">Mejor Jornada</span>
+            <span class="highlight__jornada">Jornada {{ getMejorJornada()!.numero }}</span>
+            <span class="highlight__value">{{ getMejorJornada()!.puntos }} pts</span>
+          </div>
+        }
+        @if (getPeorJornada()) {
+          <div class="highlight peor">
+            <span class="highlight__label">Peor Jornada</span>
+            <span class="highlight__jornada">Jornada {{ getPeorJornada()!.numero }}</span>
+            <span class="highlight__value">{{ getPeorJornada()!.puntos }} pts</span>
+          </div>
+        }
+      </div>
+
+      <div class="historico">
+        <h2>Histórico de Jornadas</h2>
+        <div class="tabla-scroll">
+          <table class="historico-tabla">
+            <thead>
+              <tr>
+                <th>Jornada</th>
+                <th>Partido</th>
+                <th>Resultado</th>
+                <th>Pronóstico</th>
+                <th>Puntos</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (jornada of stats()!.jornadas; track jornada.numero) {
+                <tr [class.acierto]="jornada.pronostico === jornada.resultado">
+                  <td class="col-jornada">{{ jornada.numero }}</td>
+                  <td class="col-partido">{{ jornada.partido }}</td>
+                  <td class="col-resultado">{{ jornada.resultado || '—' }}</td>
+                  <td class="col-pronostico">{{ jornada.pronostico || '—' }}</td>
+                  <td class="col-puntos">
+                    <span class="puntos" 
+                      [ngClass]="{
+                        'puntos--bajo': +jornada.puntos >= 0 && +jornada.puntos <= 49,
+                        'puntos--medio': +jornada.puntos > 49 && +jornada.puntos < 160,
+                        'puntos--alto': +jornada.puntos >= 160
+                      }" 
+                      >
+                      {{ jornada.puntos }}
+                    </span>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  }
+</main>

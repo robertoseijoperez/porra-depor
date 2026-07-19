@@ -1,0 +1,28 @@
+<main class="page">
+  @if (cargando()) {
+    <p class="estado">Cargando...</p>
+  } @else if (error() || !jornada()) {
+    <p class="estado error">No se ha encontrado esta jornada.</p>
+  } @else {
+    @if (jornada(); as j) {
+      <header class="hero">
+        <a routerLink="/jornadas" class="back-link">← Todas las jornadas</a>
+        <p class="eyebrow">Jornada {{ j.numero }}</p>
+        <h1>{{ j.partido }}</h1>
+        <p class="resultado">{{ j.resultado }}</p>
+      </header>
+
+      <ul class="participantes">
+        @for (p of participantes(); track p.nombre; let i = $index) {
+          <li class="participante" [attr.data-pos]="$index">
+            <span class="participante__nombre">{{ p.nombre }}</span>
+            <span class="participante__pronostico">{{ p.pronostico }}</span>
+            <span class="participante__puntos">{{ p.puntos }}</span>
+          </li>
+        }
+      </ul>
+
+      <p class="turnos">Orden de turno: {{ j.turnos }}</p>
+    }
+  }
+</main>

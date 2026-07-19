@@ -1,0 +1,29 @@
+<main class="page">
+  <header class="hero">
+     <img class="escudo" src="icons/icon-600x600.png" alt="Escudo del Deportivo">
+    <p class="eyebrow">Temporada 2025-2026</p>
+    <h1>Porra Depor</h1>
+  </header>
+
+  @if (cargando()) {
+  <p class="estado">Cargando clasificación...</p>
+  } @else if (error()) {
+  <p class="estado error">Error al cargar los datos. Inténtalo de nuevo.</p>
+  } @else {
+  <ul class="clasificacion">
+    @for (jugador of clasificacion(); track jugador.nombre) {
+    <li class="jugador" [attr.data-pos]="jugador.posicion">
+      <span class="jugador__pos">{{ jugador.posicion }}</span>
+      <a [routerLink]="['/jugador', jugador.nombre]" class="jugador__nombre">{{ jugador.nombre }}</a>
+      <span class="jugador__medalla">{{ emojis[jugador.posicion] }}</span>
+      <span class="jugador__puntos">{{ jugador.puntos }}</span>      
+    </li>
+    }
+  </ul>
+
+  <div class="botones-seccion">
+  <a routerLink="/pronostico-registro" class="btn-registrar">📝 Registrar pronóstico</a>
+  <a routerLink="/jornadas" class="btn-jornadas">Ver todas las jornadas →</a>
+</div>
+  }
+</main>

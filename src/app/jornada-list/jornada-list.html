@@ -1,0 +1,24 @@
+<main class="page">
+  <header class="hero hero--compact">
+    <a routerLink="/" class="back-link">← Clasificación</a>
+    <h1>Jornadas</h1>
+  </header>
+
+  @if (cargando()) {
+    <p class="estado">Cargando jornadas...</p>
+  } @else if (error()) {
+    <p class="estado error">Error al cargar los datos.</p>
+  } @else {
+    <ul class="jornadas">
+      @for (jornada of jornadas(); track jornada.numero) {
+        <li>
+          <a [routerLink]="['/jornadas', jornada.numero]" class="jornada-row">
+            <span class="jornada-row__num">J{{ jornada.numero }}</span>
+            <span class="jornada-row__partido">{{ jornada.partido }}</span>
+            <span class="jornada-row__resultado">{{ jornada.resultado || '–' }}</span>
+          </a>
+        </li>
+      }
+    </ul>
+  }
+</main>

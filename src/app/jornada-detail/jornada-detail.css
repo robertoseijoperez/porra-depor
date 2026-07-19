@@ -1,0 +1,111 @@
+.page {
+  max-width: 520px;
+  margin: 0 auto;
+  padding: 0 1.5rem 5rem;
+}
+
+.hero {
+  background: linear-gradient(160deg, var(--color-deportivo), var(--color-deportivo-dark));
+  margin: 0 -1.5rem 2rem;
+  padding: 2.5rem 1.5rem 2rem;
+  border-radius: 0 0 24px 24px;
+  color: white;
+}
+
+.back-link {
+  display: inline-block;
+  margin-bottom: 1rem;
+  color: rgba(255, 255, 255, 0.75);
+  text-decoration: none;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.8rem;
+}
+
+.back-link:hover { color: white; }
+
+.estado {
+  text-align: center;
+  color: var(--color-ink-soft);
+  font-style: italic;
+}
+
+.estado.error { color: var(--color-danger); }
+
+.eyebrow {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.7rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  opacity: 0.75;
+  margin: 0 0 0.25rem;
+}
+
+h1 {
+  margin: 0 0 0.5rem;
+  font-size: 1.7rem;
+  color: white;
+}
+
+.resultado {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 1.6rem;
+  font-weight: 700;
+  margin: 0;
+}
+
+.participantes {
+  list-style: none;
+  margin: 0 0 1.5rem;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.participante {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.85rem 1.1rem;
+  border-radius: 8px;
+  background: white;
+  border: 1px solid var(--color-line);
+}
+
+.participante[data-pos="0"] { border-left: 5px solid var(--color-gold); }
+.participante[data-pos="1"] { border-left: 5px solid var(--color-silver); }
+.participante[data-pos="2"] { border-left: 5px solid var(--color-bronze); }
+.participante[data-pos="3"] { border-left: 5px solid var(--color-line); }
+
+
+.participante.ganador {
+  border-left: 5px solid var(--color-gold);
+  background: #fffdf3;
+}
+
+.participante__nombre {
+  flex: 1;
+  font-family: 'Oswald', sans-serif;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.participante__pronostico {
+  font-family: 'JetBrains Mono', monospace;
+  color: var(--color-ink-soft);
+}
+
+.participante__puntos {
+  font-family: 'JetBrains Mono', monospace;
+  font-weight: 700;
+  color: var(--color-deportivo);
+  min-width: 3rem;
+  text-align: right;
+}
+
+.turnos {
+  text-align: center;
+  font-size: 0.85rem;
+  color: var(--color-ink-soft);
+  font-style: italic;
+}

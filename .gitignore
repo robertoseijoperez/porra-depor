@@ -7,6 +7,7 @@
 /bazel-out
 
 # Node
+functions/service-account-key.json
 /node_modules
 npm-debug.log
 yarn-error.log

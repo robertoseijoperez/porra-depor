@@ -1,0 +1,100 @@
+<main class="page pronostico-registro">
+  <header class="hero">
+    <p class="eyebrow">Registrar Pronóstico</p>
+    <h1>Jornada @if (jornada()) { {{ jornada()!.numero }} }</h1>
+  </header>
+
+  @if (cargando()) {
+    <p class="estado">Cargando jornada...</p>
+  } @else if (error()) {
+    <p class="estado error">{{ error() }}</p>
+    <button (click)="volver()" class="btn-volver">← Volver</button>
+  } @else if (jornada()) {
+    <div class="contenedor-registro">
+      <!-- Información del partido -->
+      <section class="partido-info">
+        <h2>⚽ Partido</h2>
+        <p class="partido-nombre">{{ jornada()!.partido }}</p>
+      </section>
+
+      <!-- Estado de los pronósticos -->
+      <section class="pronosticos-estado">
+        <div class="col-izq">
+          <h3>Pronósticos ingresados</h3>
+          <ul class="lista-pronosticos">
+            @for (jugador of ['juan', 'maria', 'rober', 'juanocho']; track jugador) {
+              @if (pronosticos().get(jugador)?.confirmado) {
+                <li class="pronostico-item confirmado">
+                  <span class="nombre">{{ jugador | titlecase }}</span>
+                  <span class="valor">{{ pronosticos().get(jugador)?.pronostico }}</span>
+                  <span class="icono">✅</span>
+                </li>
+              }
+            }
+            @if (jugadoresCompletados().length === 0) {
+              <p class="sin-pronosticos">Aún no hay pronósticos registrados</p>
+            }
+          </ul>
+        </div>
+
+        <div class="col-der">
+          <h3>Orden de turnos</h3>
+          <div class="turnos">
+            <div class="turno-actual">
+              <p class="label">Turno actual:</p>
+              <p class="jugador">👨 {{ jugadorActual() | titlecase }}</p>
+            </div>
+            @if (siguientesJugadores().length > 0) {
+              <div class="turnos-siguientes">
+                <p class="label">Próximos:</p>
+                <ol>
+                  @for (jugador of siguientesJugadores(); track jugador) {
+                    <li>{{ jugador }}</li>
+                  }
+                </ol>
+              </div>
+            }
+          </div>
+        </div>
+      </section>
+
+      <!-- Formulario de pronóstico -->
+      @if (!todoCompleto()) {
+        <section class="formulario-pronostico">
+          <h3>Registrar pronóstico</h3>
+          <div class="form-group">
+            <label for="pronostico">¿Cuál es tu pronóstico? (formato: X-Y, ej: 2-1)</label>
+            <input
+              #pronosticoInput
+              id="pronostico"
+              type="text"
+              [(ngModel)]="inputPronostico"
+              [disabled]="enviando()"
+              placeholder="Ej: 2-1"
+              maxlength="3"
+            />
+          </div>
+          @if (error()) {
+            <p class="error-mensaje">{{ error() }}</p>
+          }
+          <button
+            (click)="confirmarPronostico()"
+            [disabled]="enviando() || !inputPronostico()"
+            class="btn-confirmar"
+          >
+            @if (enviando()) {
+              Guardando...
+            } @else {
+              Confirmar pronóstico
+            }
+          </button>
+        </section>
+      } @else {
+        <section class="completado">
+          <p class="mensaje-exito">✅ ¡Todos los pronósticos de esta jornada están registrados!</p>
+          <button (click)="volver()" class="btn-volver">Volver a clasificación</button>
+        </section>
+      }
+    </div>
+  }
+</main>
