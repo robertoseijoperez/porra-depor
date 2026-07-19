@@ -4,7 +4,7 @@ WORKDIR /app
 
 # Copiar server
 COPY server/package*.json ./server/
-RUN cd server && npm ci
+RUN cd server && npm install
 
 # Copiar archivos del servidor
 COPY server/ ./server/
