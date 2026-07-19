@@ -4,7 +4,6 @@ const cors = require('cors');
 
 const app = express();
 
-// CORS PRIMERO
 app.use(cors({
   origin: '*',
   methods: ['GET', 'POST', 'OPTIONS'],
@@ -13,8 +12,25 @@ app.use(cors({
 
 app.use(express.json());
 
-// Importar Service Account
-const serviceAccount = require('./service-account-key.json');
+// Crear serviceAccount desde variable de entorno
+let serviceAccount;
+
+try {
+  if (process.env.SERVICE_ACCOUNT_KEY) {
+    // Si está en base64
+    serviceAccount = JSON.parse(
+      Buffer.from(process.env.SERVICE_ACCOUNT_KEY, 'base64').toString('utf-8')
+    );
+  } else if (process.env.NODE_ENV === 'production') {
+    throw new Error('SERVICE_ACCOUNT_KEY no está configurada');
+  } else {
+    // En desarrollo, usar el archivo local
+    serviceAccount = require('./service-account-key.json');
+  }
+} catch (error) {
+  console.error('Error al cargar credenciales:', error.message);
+  process.exit(1);
+}
 
 const auth = new google.auth.GoogleAuth({
   credentials: serviceAccount,
@@ -36,12 +52,10 @@ app.post('/guardarPronostico', async (req, res) => {
 
     console.log('Solicitud recibida:', { numeroJornada, jugador, pronostico });
 
-    // Validar
     if (!numeroJornada || !jugador || !pronostico) {
       return res.status(400).json({ error: 'Datos incompletos' });
     }
 
-    // Mapear jugador a columna
     const columnasMap = {
       juan: 'D',
       maria: 'F',
@@ -54,13 +68,11 @@ app.post('/guardarPronostico', async (req, res) => {
       return res.status(400).json({ error: 'Jugador no reconocido' });
     }
 
-    // Calcular fila
     const fila = numeroJornada + 1;
     const range = `Partidos!${columna}${fila}`;
 
     console.log('Escribiendo en:', range, 'valor:', pronostico);
 
-    // Escribir en Google Sheets
     await sheets.spreadsheets.values.update({
       spreadsheetId: SPREADSHEET_ID,
       range,
