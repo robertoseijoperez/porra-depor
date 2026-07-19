@@ -10,7 +10,7 @@
   },
   "engines": {
     "node": "22.13.1"
-  }
+  },
   "private": true,
   "dependencies": {
     "@angular/common": "^22.0.0",
