@@ -1,5 +1,5 @@
 import { Component, OnInit, signal, inject, computed } from '@angular/core';
-import { Router } from '@angular/router';
+import { RouterLink } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { SheetsService, Jornada } from '../sheets';
@@ -12,14 +12,12 @@ interface PronosticoState {
 
 @Component({
   selector: 'app-pronostico-registro',
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, RouterLink],
   templateUrl: './pronostico-registro.html',
   styleUrl: './pronostico-registro.css'
 })
 export class PronosticoRegistroComponent implements OnInit {
   private sheetsService = inject(SheetsService);
-  private router = inject(Router);
-
   protected cargando = signal(true);
   protected error = signal('');
   protected jornada = signal<Jornada | null>(null);
@@ -50,7 +48,7 @@ export class PronosticoRegistroComponent implements OnInit {
     return turnos.find(jugador => {
       const state = this.pronosticos().get(jugador);
       return !state || !state.confirmado;
-    });
+    })?? '';
   });
 
   // Computed: siguientes jugadores
@@ -77,7 +75,13 @@ export class PronosticoRegistroComponent implements OnInit {
   });
 
   ngOnInit() {
-    this.cargarJornada();
+    this.cargarJornada();     
+  }
+
+  protected construirRutaFoto(nombre: string): string {    
+    console.debug("nombre: " + nombre);    
+
+    return `assets/players/${nombre}.jpg`;
   }
 
   private cargarJornada() {
@@ -157,9 +161,5 @@ export class PronosticoRegistroComponent implements OnInit {
         console.error(err);
       }
     });
-  }
-
-  volver() {
-    this.router.navigate(['']);
-  }
+  }  
 }

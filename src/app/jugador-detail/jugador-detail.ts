@@ -1,7 +1,8 @@
-import { Component, OnInit, signal, inject, computed } from '@angular/core';
+import { Component, OnInit, signal, inject, computed, effect } from '@angular/core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { SheetsService, EstadsJugador, JornadaJugador, Clasificacion } from '../sheets';
+import { SheetContextService } from '../sheet-context.service';
 
 @Component({
   selector: 'app-jugador-detail',
@@ -11,8 +12,8 @@ import { SheetsService, EstadsJugador, JornadaJugador, Clasificacion } from '../
 })
 export class JugadorDetailComponent implements OnInit {
   private sheetsService = inject(SheetsService);
-  private route = inject(ActivatedRoute);
-
+  private sheetContext = inject(SheetContextService);
+  private route = inject(ActivatedRoute);  
 
   protected stats = signal<EstadsJugador | null>(null);
   protected cargando = signal(true);
@@ -21,20 +22,40 @@ export class JugadorDetailComponent implements OnInit {
   protected fotoPerfil = signal('');
   protected clasificacion = signal<Clasificacion[]>([]);
 
+  private setupEffect = effect(() => {
+    const nombre = this.nombreJugador();
+    this.sheetContext.spreadsheetIdActual();
+    
+    if (nombre) {
+      this.fotoPerfil.set(this.construirRutaFoto(nombre));
+      this.nombreJugador.set(nombre);
+      this.cargarStats(nombre);
+    }
+  });
+
   ngOnInit() {
     this.route.paramMap.subscribe(params => {
       const nombre = params.get('nombre');
-      if (nombre) {
-        this.fotoPerfil.set(this.construirRutaFoto(nombre));        
-        this.nombreJugador.set(nombre);
-        this.cargarStats(nombre);
 
+      if (nombre) {
+        this.nombreJugador.set(nombre);
       }
-    });
+
+    });    
   }
 
   private construirRutaFoto(nombre: string): string {
-    return `assets/players/${nombre.toLowerCase()}.jpg`;
+    const normalizar = (str: string) => 
+          str.toLowerCase()
+            .normalize('NFD')
+            .replace(/[\u0300-\u036f]/g, '');
+        
+        const nombreNormalizado = normalizar(nombre);
+
+        console.debug("nombre: " + nombre );
+        console.debug("nombreNormalizado: " + nombreNormalizado);
+
+    return `assets/players/${nombreNormalizado}.jpg`;
   }
 
   private cargarStats(nombre: string) {
@@ -83,20 +104,36 @@ protected posicionJugador = computed(() => {
 });
 
   protected getMejorJornada(): JornadaJugador | undefined {
-    return this.stats()?.jornadas.reduce((max, j) => (j.puntos > max.puntos ? j : max));
+    const jornadasCompletadas = this.stats()?.jornadas.filter(j => j.resultado && j.resultado.trim() !== '') || [];
+    return jornadasCompletadas.reduce((max, j) => (j.puntos > max.puntos ? j : max));
   }
 
   protected getPeorJornada(): JornadaJugador | undefined {
-    return this.stats()?.jornadas.reduce((min, j) => (j.puntos < min.puntos ? j : min));
+    const jornadasCompletadas = this.stats()?.jornadas.filter(j => j.resultado && j.resultado.trim() !== '') || [];
+    return jornadasCompletadas.reduce((min, j) => (j.puntos < min.puntos ? j : min));
+  }
+
+  protected getJornadasConResultado(): number {
+    if (!this.stats()) return 1;
+    return this.stats()!.jornadas.filter(j => j.resultado && j.resultado.trim() !== '').length;
   }
 
   protected getAciertos(): number {
     if (!this.stats()) return 0;
-    return this.stats()!.jornadas.filter(j => j.pronostico === j.resultado).length;
+    return this.stats()!.jornadas.filter(j => {
+      const tieneResultado = j.resultado && j.resultado.trim() !== '';
+      return tieneResultado && j.pronostico === j.resultado;
+    }).length;
+  }
+
+  protected getAciertosFormato(): string {
+    const aciertos = this.getAciertos();
+    const jornadasConResultado = this.getJornadasConResultado();
+    return `${aciertos}/${jornadasConResultado}`;
   }
 
   protected getTasaAcierto(): number {
-    const jornadas = this.stats()?.jornadas.length || 1;
-    return Math.round((this.getAciertos() / jornadas) * 100);
+    const jornadasConResultado = this.getJornadasConResultado();
+    return Math.round((this.getAciertos() / jornadasConResultado) * 100);
   }
 }

@@ -1,29 +1,58 @@
 <main class="page">
+  <div class="temporadas-slider">
+    <button 
+      class="btn-nav btn-nav--prev"
+      (click)="irATemporadaAnterior()"
+      [disabled]="temporadaActualIndex() === 0"
+      aria-label="Temporada anterior">
+      ←
+    </button>
+
+    <div class="temporadas-contenedor" #temporadasContenedor>
+      @for (temporada of temporadas; track temporada.spreadsheetId) {
+        <div 
+          class="temporada-card"
+          [class.activa]="temporadaActualIndex() === $index"
+          (click)="cambiarTemporada($index)">
+          <span class="temporada-card__year">{{ temporada.year }}</span>
+        </div>
+      }
+    </div>
+
+    <button 
+      class="btn-nav btn-nav--next"
+      (click)="irATemporadaSiguiente()"
+      [disabled]="temporadaActualIndex() === temporadas.length - 1"
+      aria-label="Temporada siguiente">
+      →
+    </button>
+  </div>
+
   <header class="hero">
-     <img class="escudo" src="icons/icon-600x600.png" alt="Escudo del Deportivo">
-    <p class="eyebrow">Temporada 2025-2026</p>
+    <img class="escudo" src="icons/icon-600x600.png" alt="Escudo del Deportivo">
+    <p class="eyebrow">Temporada {{ temporadaActual().year }}</p>
     <h1>Porra Depor</h1>
   </header>
 
   @if (cargando()) {
-  <p class="estado">Cargando clasificación...</p>
+    <p class="estado">Cargando clasificación...</p>
   } @else if (error()) {
-  <p class="estado error">Error al cargar los datos. Inténtalo de nuevo.</p>
+    <p class="estado error">Error al cargar los datos. Inténtalo de nuevo.</p>
   } @else {
-  <ul class="clasificacion">
-    @for (jugador of clasificacion(); track jugador.nombre) {
-    <li class="jugador" [attr.data-pos]="jugador.posicion">
-      <span class="jugador__pos">{{ jugador.posicion }}</span>
-      <a [routerLink]="['/jugador', jugador.nombre]" class="jugador__nombre">{{ jugador.nombre }}</a>
-      <span class="jugador__medalla">{{ emojis[jugador.posicion] }}</span>
-      <span class="jugador__puntos">{{ jugador.puntos }}</span>      
-    </li>
-    }
-  </ul>
+    <ul class="clasificacion">
+      @for (jugador of clasificacion(); track jugador.nombre) {
+        <li class="jugador" [attr.data-pos]="jugador.posicion">
+          <span class="jugador__pos">{{ jugador.posicion }}</span>
+          <a [routerLink]="['/jugador', jugador.nombre]" class="jugador__nombre">{{ jugador.nombre }}</a>
+          <span class="jugador__medalla">{{ emojis[jugador.posicion] }}</span>
+          <span class="jugador__puntos">{{ jugador.puntos }}</span>      
+        </li>
+      }
+    </ul>
 
-  <div class="botones-seccion">
-  <a routerLink="/pronostico-registro" class="btn-registrar">📝 Registrar pronóstico</a>
-  <a routerLink="/jornadas" class="btn-jornadas">Ver todas las jornadas →</a>
-</div>
+    <div class="botones-seccion">
+      <a routerLink="/pronostico-registro" class="btn-registrar">📝 Registrar pronóstico</a>
+      <a routerLink="/jornadas" class="btn-jornadas">Ver todas las jornadas →</a>
+    </div>
   }
 </main>

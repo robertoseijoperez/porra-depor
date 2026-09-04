@@ -2,6 +2,7 @@ import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { map } from 'rxjs/operators';
 import { environment } from '../environments/environment';
+import { SheetContextService } from './sheet-context.service';
 
 export interface Jornada {
   numero: number;
@@ -48,12 +49,20 @@ export interface JornadaJugador {
 })
 export class SheetsService {
   private http = inject(HttpClient);
-  private base = `https://sheets.googleapis.com/v4/spreadsheets/${environment.spreadsheetId}/values`;
+  private sheetContext = inject(SheetContextService);
   private key = `key=${environment.sheetsApiKey}`;
 
+  private getBaseUrl(spreadsheetId: string): string {
+    return `https://sheets.googleapis.com/v4/spreadsheets/${spreadsheetId}/values`;
+  }
+
   getJornadas() {
+    const spreadsheetId = this.sheetContext.spreadsheetIdActual();
+    const sheetId = spreadsheetId || environment.spreadsheetId;
+    const base = this.getBaseUrl(sheetId);
+
     return this.http
-      .get<any>(`${this.base}/Partidos?${this.key}`)
+      .get<any>(`${base}/Partidos?${this.key}`)
       .pipe(
         map(res => {
           const rows: string[][] = res.values.slice(1); // saltar cabecera
@@ -80,8 +89,12 @@ export class SheetsService {
   }
 
   getClasificacion() {
+    const spreadsheetId = this.sheetContext.spreadsheetIdActual();
+    const sheetId = spreadsheetId || environment.spreadsheetId;
+    const base = this.getBaseUrl(sheetId);
+
     return this.http
-      .get<any>(`${this.base}/Clasificación?${this.key}`)
+      .get<any>(`${base}/Clasificación?${this.key}`)
       .pipe(
         map(res => {
           const rows: string[][] = res.values.slice(1);
@@ -94,7 +107,7 @@ export class SheetsService {
       );
   }
 
-  getEstadsJugador(nombre: string) {
+  getEstadsJugador(nombre: string) {    
     return this.getJornadas().pipe(
       map(jornadas => {
         // Normalizar nombre: minúsculas y remover acentos
@@ -121,8 +134,12 @@ export class SheetsService {
           puntos: j.puntos[key]
         }));
 
-        const puntosTotales = jornadasJugador.reduce((sum, j) => sum + j.puntos, 0);
-        const puntosPromedio = Math.round((puntosTotales / jornadasJugador.length) * 100) / 100;        
+        // Calcular totales solo sobre jornadas completadas (con resultado real, no vacío ni solo espacios)
+        const jornadasCompletadas = jornadasJugador.filter(j => j.resultado && j.resultado.trim() !== '');
+        const puntosTotales = jornadasCompletadas.reduce((sum, j) => sum + j.puntos, 0);
+        const puntosPromedio = jornadasCompletadas.length > 0 
+          ? Math.round((puntosTotales / jornadasCompletadas.length) * 100) / 100
+          : 0;        
 
         return {
           nombre: nombre.charAt(0).toUpperCase() + nombre.slice(1),
@@ -135,12 +152,17 @@ export class SheetsService {
   }
 
   guardarPronostico(numeroJornada: number, jugador: string, pronostico: string) {
-  const railwayUrl = 'https://porra-depor-production.up.railway.app/guardarPronostico';
-  
-  return this.http.post<any>(railwayUrl, {
-    numeroJornada,
-    jugador,
-    pronostico
-  });
-}
+    const railwayUrl = 'https://porra-depor.up.railway.app/guardarPronostico';
+    const temporadaActual = this.sheetContext.temporadaActual().year;
+    const localUrl = 'http://localhost:3000/guardarPronostico'; 
+
+    console.log("Antes post: " + numeroJornada + " " + jugador + " " + pronostico + " " + temporadaActual);
+
+    return this.http.post<any>(railwayUrl, {
+      numeroJornada,
+      jugador,
+      pronostico,
+      temporadaActual
+    });
+  }
 }

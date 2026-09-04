@@ -1,14 +1,13 @@
-<main class="page pronostico-registro">
-  <header class="hero">
-    <p class="eyebrow">Registrar Pronóstico</p>
+<main class="page">
+  <header class="hero hero--compact">    
+    <a routerLink="/" class="back-link">← Clasificación</a>
     <h1>Jornada @if (jornada()) { {{ jornada()!.numero }} }</h1>
   </header>
 
   @if (cargando()) {
     <p class="estado">Cargando jornada...</p>
   } @else if (error()) {
-    <p class="estado error">{{ error() }}</p>
-    <button (click)="volver()" class="btn-volver">← Volver</button>
+    <p class="estado error">{{ error() }}</p>    
   } @else if (jornada()) {
     <div class="contenedor-registro">
       <!-- Información del partido -->
@@ -42,7 +41,7 @@
           <div class="turnos">
             <div class="turno-actual">
               <p class="label">Turno actual:</p>
-              <p class="jugador">👨 {{ jugadorActual() | titlecase }}</p>
+              <p class="jugador"><img [src]="construirRutaFoto(jugadorActual())" alt="Foto de {{ jugadorActual() }}" class="player-photo"> {{ jugadorActual() | titlecase }}</p>
             </div>
             @if (siguientesJugadores().length > 0) {
               <div class="turnos-siguientes">
@@ -91,8 +90,7 @@
         </section>
       } @else {
         <section class="completado">
-          <p class="mensaje-exito">✅ ¡Todos los pronósticos de esta jornada están registrados!</p>
-          <button (click)="volver()" class="btn-volver">Volver a clasificación</button>
+          <p class="mensaje-exito">✅ ¡Todos los pronósticos de esta jornada están registrados!</p>          
         </section>
       }
     </div>
